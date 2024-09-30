@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const session = require('express-session')
+const session = require('express-session');
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 
@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
+app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}));
 
 app.use("/customer/auth/*", function auth(req,res,next){
     // Check if user is logged in and has valid access token
@@ -20,11 +20,11 @@ app.use("/customer/auth/*", function auth(req,res,next){
                 req.user = user;
                 next(); // Proceed to the next middleware
             } else {
-                return res.status(403).json({ message: "Customer not authenticated" });
+                return res.status(403).send("Customer not authenticated");
             }
         });
     } else {
-        return res.status(403).json({ message: "Customer not logged in" });
+        return res.status(403).send("Customer not logged in");
     }
 });
  

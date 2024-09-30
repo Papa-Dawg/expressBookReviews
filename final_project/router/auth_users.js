@@ -37,7 +37,7 @@ regd_users.post("/login", (req,res) => {
   const password = req.body.password;
     // Check if username or password is missing
     if (!username || !password) {
-        return res.status(404).json({ message: "Error logging in" });
+        return res.status(404).send("Error logging in");
     }
     // Authenticate user
     if (authenticatedUser(username, password)) {
@@ -51,14 +51,38 @@ regd_users.post("/login", (req,res) => {
         }
         return res.status(200).send("Customer successfully logged in");
     } else {
-        return res.status(208).json({ message: "Invalid Login. Check username and password" });
+        return res.status(208).send("Invalid Login. Check username and password");
     }
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const { isbn } = req.params; // The book ISBN
+    const { review } = req.body; // New review content
+    const username = req.session.authorization.username;
+
+    // Find the book by ID
+    const book = books[isbn];
+    if (!book) {
+        return res.status(404).send("Book not found.");
+    }
+
+    // Update or add the review
+    book.reviews[username] = review;
+
+    return res.status(200).send("The review for the book with ISBN " + isbn + " has been added/updated.");
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const { isbn } = req.params; // The book ISBN
+    const username = req.session.authorization.username;
+    const book = books[isbn]
+
+    // Delete the review
+    delete book.reviews[username];
+
+    return res.status(200).send("The review posted by the user " + username + " for the book with ISBN " + isbn + " has been deleted.");
 });
 
 module.exports.authenticated = regd_users;
